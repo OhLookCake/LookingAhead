@@ -7,12 +7,12 @@ ystart <- 2000
 yend   <- 2020
 
 rawVolumes <- do.call(cbind,
-		lapply(ystart:yend, function(query){
-			cat("Query: ", query, "\n")
-			yearVolume <- TrendQuery(query)
-			yearVolume$V2
-			cat("Complete\n")
-		})
+					  lapply(ystart:yend, function(query){
+					  	cat("Query: ", query, "\n")
+					  	yearVolume <- TrendQuery(query)
+					  	yearVolume$V2
+					  	cat("Complete\n")
+					  })
 )
 
 dummyResults <- TrendQuery("velociraptors")  #kinda unnecessary, but keeps the lapply of calls clean
@@ -27,6 +27,3 @@ colnames(volumes) <- c("")
 
 ## Write it out ##
 write.csv(volumes, 'data/volumes.csv', row.names=F, quote=F)
-
-
-

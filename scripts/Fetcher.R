@@ -1,4 +1,3 @@
-
 library(RCurl)
 
 setwd('C:/etc/Projects/Data/_Ongoing/LookingAhead')
@@ -11,7 +10,7 @@ password <- credentials[2]
 #setup urls
 loginURL 		<- "https://accounts.google.com/accounts/ServiceLogin"
 authenticateURL <- "https://accounts.google.com/accounts/ServiceLoginAuth"
-trendsURL 		<- "http://www.google.com/trends/TrendsReport?"
+trendsURL 		<- "http://www.google.com/trends/trendsReport?"
 
 
 GetGALX <- function(curl) {
@@ -55,7 +54,7 @@ gLogin <- function(username, password) {
 
 
 
-TrendQuery <- function(q, availableRows=533, scale=0){
+TrendQuery <- function(term, availableRows=533, scale=0){
 	#Actual Querying
 	
 	#533 is the number of weeks of data available as of time of running this.
@@ -64,9 +63,15 @@ TrendQuery <- function(q, availableRows=533, scale=0){
 	
 	#scale = 0: absolute, 1: relative
 	
-	g <- gLogin(username, password)
-	qauthenticatePage2 <- getURL("http://www.google.com", curl=g)
-	res <- getForm(trendsURL, q=q, content=1, export=1, graph="all_csv", scale = scale, curl=g)
+	loginCurlHandle <- gLogin(username, password)
+	qauthenticatePage2 <- getURL("http://www.google.com", curl=loginCurlHandle)
+	res <- getForm(trendsURL, 
+				   q = term, 
+				   content = 1, 
+				   export = 1,
+				   graph = "all_csv",
+				   #scale = scale, # doesn't actually seem to work
+				   curl = loginCurlHandle)
 	
 	if( grepl("You have reached your quota limit", res)) {
 		stop("Quota limit reached. Request denied.")
@@ -74,5 +79,13 @@ TrendQuery <- function(q, availableRows=533, scale=0){
 		cat("Results fetched.\n")
 	}
 	
+	x <- NULL
 	x <- read.table(text=res, sep=",",skip=32, nrows=availableRows)
+	if(is.null(x)){
+		cat(res)
+	}
+	x
 }
+
+
+
